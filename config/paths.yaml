@@ -1,0 +1,18 @@
+project_root: /home/lutz_tower/fsc_project/fsc_data
+
+data:
+  aoi: data/aoi/aoi_32632.geojson
+  drone_scenes: data/drone/drone_scenes/
+  binary_snow: data/drone/binary_snow/clipped/
+  elevation: data/elevation/
+  s2_dir: data/s2/
+  processed_s2: data/s2/processed_s2/
+  fsc_gt: data/fsc_gt/
+  forest: data/forest/ #10m res binary raster indicating forested areas for the entire alps (wekeo foresttype 2020)
+  cubes: data/cubes/
+  dataframes: data/dataframes/
+output:
+  predictions: outputs/predictions/
+  plots: outputs/plots/
+  metrics: outputs/metrics/
+  temp: outputs/temp/

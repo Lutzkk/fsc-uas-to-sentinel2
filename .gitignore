@@ -16,7 +16,7 @@ data/*
 *.hdf
 *.h5
 
-# GDAL / QGIS sidecar files (you have ~136 of these)
+# GDAL/qgis files
 *.aux.xml
 *.ovr
 *.qmd
@@ -24,7 +24,7 @@ data/*
 *.qgs
 *.qgs~
 
-# Vector data (except the AOI whitelisted above)
+# Vector data
 *.shp
 *.shx
 *.dbf
@@ -43,7 +43,7 @@ data/*
 *.laz
 *.xyz
 
-# Archives (GLCM 11 GB, UAV data 24 GB, poster drafts)
+# Archives
 *.zip
 *.tar
 *.tar.gz
