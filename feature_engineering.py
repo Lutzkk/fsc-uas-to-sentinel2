@@ -20,10 +20,10 @@ def main():
 
     # Define paths to drone scenes
     
-    drone_path_20240920 = paths["data"]["binary_snow"] / "binarysnow_20240920_clipped.tif"
-    drone_path_20241025 = paths["data"]["binary_snow"] / "binarysnow_20241025_clipped.tif"
-    drone_path_20250225 = paths["data"]["binary_snow"] / "binarysnow_20250225_clipped.tif"
-    drone_path_20250604 = paths["data"]["binary_snow"] / "binarysnow_20250604_clipped.tif" #VALIDATION SCENE
+    drone_path_20240920 = paths["data"]["binary_snow_raw"] / "2024_09_20/binary_snow_20240920_cleaned_disksize0.tif"
+    drone_path_20241025 = paths["data"]["binary_snow_raw"] / "2024_10_24/binary_snow_20241024_cleaned_disksize2.tif"
+    drone_path_20250225 = paths["data"]["binary_snow_raw"] / "2025_02_25/20250225_binary_snow.tif"
+    drone_path_20250604 = paths["data"]["binary_snow_raw"] / "2025_06_04/binary_snow_map_20250604.tif" #VALIDATION SCENE
     #20250604 is val scene
     
     #define fsc grid path 

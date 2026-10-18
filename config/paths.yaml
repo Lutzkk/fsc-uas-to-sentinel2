@@ -4,6 +4,9 @@ data:
   aoi: data/aoi/aoi_32632.geojson
   drone_scenes: data/drone/drone_scenes/
   binary_snow: data/drone/binary_snow/clipped/
+  binary_snow_raw: data/drone/binary_snow/
+  training_data: data/drone/training_data/
+  validation_polygons: data/drone/validation_polygons/
   elevation: data/elevation/
   s2_dir: data/s2/
   processed_s2: data/s2/processed_s2/
