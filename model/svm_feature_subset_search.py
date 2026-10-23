@@ -10,7 +10,6 @@ import joblib
 from datetime import datetime
 from contextlib import contextmanager
 import hashlib
-import os
 
 from sklearn.svm import SVR
 from sklearn.preprocessing import StandardScaler
@@ -19,7 +18,7 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 
 
 # -------------------------------------------------------------------
-# Progress bar wrapper
+# Progress bar wrapper (joblib copypaste from llm)
 # -------------------------------------------------------------------
 @contextmanager
 def tqdm_joblib(tqdm_object):

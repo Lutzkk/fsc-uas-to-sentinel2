@@ -5,10 +5,8 @@ from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parents[1])) #crawl up one level to project root
 import rasterio as rio 
-from rasterio.transform import Affine
 import rioxarray as rxr
 import xarray as xr
-import geopandas as gpd 
 from rasterio.enums import Resampling
 import numpy as np
 
@@ -145,7 +143,7 @@ def apply_percentile_normalization(ds, pct_dict):
 
         arr = ds[band]
         arr_clipped = xr.apply_ufunc(
-            lambda x: np.clip((x - p1) / (p99 - p1), 0, 1),
+            lambda x, p1=p1, p99=p99: np.clip((x - p1) / (p99 - p1), 0, 1),
             arr,
             dask="parallelized",
             output_dtypes=[arr.dtype]

@@ -1,0 +1,32 @@
+name: fsc_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pyproj=3.7.1
+  - yaml
+  - pyyaml=6.0.3
+  - tqdm
+  - optuna
+  - rasterio=1.4.3
+  - jupyterlab
+  - rich
+  - shapely=2.1.1
+  - fiona
+  - numpy=2.2.6
+  - geopandas=1.1.1
+  - ipykernel
+  - joblib
+  - rioxarray=0.19.0
+  - xarray=2025.6.1
+  - matplotlib=3.10.7
+  - seaborn
+  - pandas=2.3.3
+  - scikit-learn=1.7.2
+  - libgdal-netcdf
+  - dask
+  - scikit-image=0.25.2
+  - libgdal-jp2openjpeg
+  - netcdf4
+  - earthengine-api

@@ -7,9 +7,8 @@ import geopandas as gpd
 import xarray as xr
 from rasterio.enums import Resampling
 import numpy as np
-from pathlib import Path
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, root_mean_squared_error
+from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
 from datetime import datetime
 #------------------
 
@@ -206,134 +205,6 @@ def merge_s2_scenes(scene_a: xr.Dataset, scene_b: xr.Dataset) -> xr.Dataset:
 
 
 
-
-#----------------------------------------
-
-def spatial_stratified_split(
-    fsc,
-    features,
-    elevation,
-    block_size=10,
-    val_fraction=0.2,
-    n_strata=5,
-    min_valid_fraction=0.05,
-    random_state=42,
-    plot_path=None
-):
-    """
-    Performs a spatial block-based stratified split over ONLY the valid FSC region.
-    Auto-crops the domain to where FSC is not NaN.
-    """
-
-    np.random.seed(random_state)
-
-    # ---- STEP 1: FIND VALID FSC BOUNDING BOX ----
-    valid_mask_full = ~np.isnan(fsc.values)
-    ys, xs = np.where(valid_mask_full)
-    if len(ys) == 0:
-        raise ValueError("No valid FSC pixels found.")
-    min_y, max_y = ys.min(), ys.max()
-    min_x, max_x = xs.min(), xs.max()
-
-    print(f"[DEBUG] Total valid FSC pixels: {valid_mask_full.sum()} out of {valid_mask_full.size}")
-    print(f"[DEBUG] Cropping to bounding box:")
-    print(f"        Y range: {min_y} to {max_y}  (height: {max_y - min_y + 1})")
-    print(f"        X range: {min_x} to {max_x}  (width:  {max_x - min_x + 1})")
-
-    # Crop to bounding box (inclusive)
-    fsc_c = fsc.isel(y=slice(min_y, max_y + 1), x=slice(min_x, max_x + 1))
-    elevation_c = elevation.isel(y=slice(min_y, max_y + 1), x=slice(min_x, max_x + 1))
-    features_c = features.isel(y=slice(min_y, max_y + 1), x=slice(min_x, max_x + 1))
-
-    h, w = fsc_c.shape
-    y_coords, x_coords = fsc_c["y"], fsc_c["x"]
-
-    # ---- STEP 2: BUILD BLOCK GRID ----
-    nby, nbx = h // block_size, w // block_size
-    block_ids = np.arange(nby * nbx).reshape(nby, nbx)
-
-    block_grid = np.full((h, w), -1, dtype=int)
-    core_h, core_w = nby * block_size, nbx * block_size
-    core_grid = np.repeat(np.repeat(block_ids, block_size, axis=0), block_size, axis=1)
-    block_grid[:core_h, :core_w] = core_grid
-
-    # ---- STEP 3: BLOCK STATS ----
-    fsc_vals = fsc_c.values
-    elev_vals = elevation_c.values
-    mean_elev = np.full((nby, nbx), np.nan)
-    valid_fraction = np.zeros((nby, nbx))
-
-    for i in range(nby):
-        for j in range(nbx):
-            block = fsc_vals[i*block_size:(i+1)*block_size, j*block_size:(j+1)*block_size]
-            elev_block = elev_vals[i*block_size:(i+1)*block_size, j*block_size:(j+1)*block_size]
-            n_total = block.size
-            n_valid = np.sum(~np.isnan(block))
-            if n_valid / n_total >= min_valid_fraction:
-                valid_fraction[i, j] = n_valid / n_total
-                mean_elev[i, j] = np.nanmean(elev_block)
-
-    valid_mask = np.isfinite(mean_elev)
-    valid_block_ids = block_ids[valid_mask]
-    valid_elev = mean_elev[valid_mask]
-
-    # ---- STEP 4: STRATIFY AND SAMPLE VALIDATION BLOCKS ----
-    elev_bins = np.nanpercentile(valid_elev, np.linspace(0, 100, n_strata + 1))
-    strata = np.digitize(valid_elev, elev_bins, right=True)
-
-    val_blocks = []
-    for s in np.unique(strata):
-        ids_in_stratum = valid_block_ids[strata == s]
-        n_val = max(1, int(len(ids_in_stratum) * val_fraction))
-        chosen = np.random.choice(ids_in_stratum, n_val, replace=False)
-        val_blocks.extend(chosen)
-
-    # ---- STEP 5: PIXEL MASKS ----
-    val_mask_np = np.isin(block_grid, val_blocks)
-    usable_area = (~np.isnan(fsc_vals)) & np.isin(block_grid, valid_block_ids)
-    val_mask_np = val_mask_np & usable_area
-    train_mask_np = (~val_mask_np) & usable_area
-
-    val_mask = xr.DataArray(val_mask_np, dims=("y", "x"), coords={"y": y_coords, "x": x_coords})
-    train_mask = xr.DataArray(train_mask_np, dims=("y", "x"), coords={"y": y_coords, "x": x_coords})
-
-    # ---- STEP 6: OPTIONAL PLOT ----
-    if plot_path is not None:
-        import matplotlib.pyplot as plt
-        import matplotlib.colors as mcolors
-
-        fig, ax = plt.subplots(figsize=(10, 6))
-
-        # Base map: FSC values
-        ax.imshow(fsc_c, cmap="Blues", origin="upper")
-
-        # Create a numeric block map: train=1, val=2 (rest ignored)
-        vis_grid = np.full_like(block_grid, np.nan, dtype=float)
-        vis_grid[train_mask_np] = 1
-        vis_grid[val_mask_np] = 2
-
-        # Overlay block assignments
-        cmap = mcolors.ListedColormap(["none", "green", "red"])
-        ax.imshow(vis_grid, cmap=cmap, alpha=0.45, origin="upper")
-
-        # Optionally add thin grid lines to show blocks
-        for i in range(0, core_h, block_size):
-            ax.axhline(i, color="black", linewidth=0.2, alpha=0.6)
-        for j in range(0, core_w, block_size):
-            ax.axvline(j, color="black", linewidth=0.2, alpha=0.6)
-
-        ax.set_title("Block-based Train/Validation Split (cropped & highlighted)")
-        ax.set_xlabel("X")
-        ax.set_ylabel("Y")
-        plt.tight_layout()
-
-        plot_path = Path(plot_path)
-        plot_path.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-        plt.close(fig)
-        print(f"Updated block visualization saved → {plot_path}")
-        print(f"Train pixels: {int(train_mask.sum())} | Validation pixels: {int(val_mask.sum())}")
-    return train_mask, val_mask, (min_y, max_y, min_x, max_x)
 
 
 #--------------------------------------------

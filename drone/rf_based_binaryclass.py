@@ -3,13 +3,10 @@
 import numpy as np
 import rasterio
 import geopandas as gpd
-from shapely.geometry import mapping
-from rasterio.features import geometry_mask
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 from sklearn.ensemble import RandomForestClassifier
 from rasterio.windows import Window
 from rasterio.features import rasterize
-from joblib import Parallel, delayed
 import os
 
 
@@ -170,8 +167,6 @@ class RandomForestSnowClassifier:
         print("\nPipeline completed successfully.")
 
 from pathlib import Path
-import rasterio
-import geopandas as gpd
 
 def check_case(name, rgb_path, training_path, classified_out, binary_out):
     print("\n" + "="*80)

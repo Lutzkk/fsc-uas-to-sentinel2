@@ -1,10 +1,7 @@
 # fsc_ground_truth.py
 
 # Script that generates ground truth fsc data from a sentinel2 grid and binary drone scene classes.
-import os
 import rasterio as rio 
-import rioxarray as rxr 
-import xarray as xr
 import numpy as np 
 import geopandas as gpd 
 from pathlib import Path 
@@ -40,11 +37,6 @@ with rio.open(s2_p) as src:
 
     out_meta=src.meta.copy()
 
-import matplotlib.pyplot as plt
-plt.imshow(out_image[0], cmap='gray')
-plt.title("Clipped Sentinel-2 Scene (Band 1)")
-plt.colorbar(label='Reflectance')
-#plt.show()
 
 # Convert to uint8
 out_image = out_image.astype(np.uint8)

@@ -1,6 +1,4 @@
 import numpy as np
-import xarray as xr
-import rioxarray as rxr
 import pandas as pd
 from pathlib import Path
 from sklearn.svm import SVR
@@ -72,7 +70,6 @@ print("\nSaved model to:", root / "model/svm_fsc_model.pkl")
 
 
 import rasterio
-from rasterio.transform import rowcol
 
 def write_predictions_to_raster(preds, val_df, cube_path, out_path):
     # load raster metadata with rasterio

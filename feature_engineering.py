@@ -1,17 +1,13 @@
 from pathlib import Path 
 import sys
 import pandas as pd
-from utils import paths
-from utils.dataloader import compute_global_percentiles, apply_percentile_normalization, fsc_with_s2_mask, load_align_rasters, load_sentinel_scene, minmax_normalize_dataset, crop_s2_to_binary_mask, save_dataset_as_tiff
+from utils.dataloader import compute_global_percentiles, apply_percentile_normalization, fsc_with_s2_mask, load_sentinel_scene, crop_s2_to_binary_mask, save_dataset_as_tiff
 from utils.paths import load_paths
-from utils.helpers import merge_s2_scenes, compute_spectral_index, mask_raster, save_dataset_as_tiffs, spatial_stratified_split, flatten_dataset, evaluate_feature_sets, vectormask
+from utils.helpers import merge_s2_scenes, compute_spectral_index, flatten_dataset, vectormask
 import rioxarray as rxr
-import xarray as xr
-import numpy as np
 
 import time
 from rasterio.enums import Resampling
-from multiprocessing import cpu_count
 
 def main():
     sys.path.append(str(Path(__file__).resolve().parents[1]))  # crawl up to project root
@@ -38,11 +34,6 @@ def main():
 
     # Define paths to Elevation Data
     dem_p=paths["data"]["elevation"]/"Zugspitze_DJIM300L1_snowfree_DSM.tif" #epsg:32632, doesnt fully match the ground truth area 
-    slope_p=paths["data"]["elevation"]/"slope.tif" #epsg:32632, 1m res, contains stripes
-    aspect_p=paths["data"]["elevation"]/"aspect.tif" #epsg:32632, 1m res, contains stripes
-
-    # Define paths to forest mask 
-    forest_p=paths["data"]["forest"]/"forest_alps_clipped_32632.tif" #binary raster indicating forested areas (10m res, epsg:32632)
 
     #---------------------------
 
