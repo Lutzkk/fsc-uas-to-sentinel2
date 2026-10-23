@@ -1,4 +1,4 @@
-# Fractional Snow Cover from UAS to Sentinel-2
+# From UAS to Satellite: Fractional Snow Cover Mapping of the Zugspitzplateau
 
 Estimating fractional snow cover (FSC) at Sentinel-2 resolution (10 m) on the Zugspitzplateau, using very-high-resolution drone imagery as ground truth. This repository contains the scripts used to generate the results presented in the poster "From UAS to Satellite: Fractional Snow Cover Mapping of the Zugspitzplateau" ([PDF](docs/poster_fsc_mapping.pdf)). **This is not a modular data pipeline. The scripts are of exploratory nature and were written for a single project. No Data is included (copyright).** Maybe someone finds it useful as reference or for building a more general pipeline from this. 
 
