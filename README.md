@@ -10,9 +10,9 @@ Maybe someone finds it useful as reference or for building a more general pipeli
 
 ## Research Questions
 
-1: Are three drone scenes enough to train a reliable Machine Learning Model to predict fractional Snow Cover at Sentinel-2 (10m) Resolution for the Zugspitzplateau?
+1: Are three drone scenes enough to train a reliable Machine Learning Model to predict fractional snow cover at Sentinel-2 (10m) resolution for the Zugspitzplateau?
 
-2: Which Features are important for the Machine Learning model and how do Support Vector Regressor and Random Forest Regressor compare?
+2: Which features are important for the Machine Learning model and how do Support Vector Regressor and Random Forest Regressor compare?
 
 ## Study area and data
 
