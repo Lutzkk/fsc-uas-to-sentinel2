@@ -53,7 +53,7 @@ print("RMSE:", np.sqrt(mean_squared_error(y_val, preds)))
 print("MAE :", mean_absolute_error(y_val, preds))
 print("R²  :", r2_score(y_val, preds))
 
-print("Saving final model...")
+print("Saving final model")
 import joblib
 
 # Save model
@@ -105,7 +105,7 @@ def write_predictions_to_raster(preds, val_df, cube_path, out_path):
     with rasterio.open(out_path, "w", **new_profile) as dst:
         dst.write(pred_full, 1)
 
-    print(f"\n✓ Prediction raster saved → {out_path}")
+    print(f"\nPrediction raster saved: {out_path}")
 
 
 from pathlib import Path

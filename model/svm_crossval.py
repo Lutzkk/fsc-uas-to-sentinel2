@@ -42,7 +42,7 @@ rmse_scores = []
 mae_scores = []
 r2_scores = []
 
-print("\nRunning Leave-One-Scene-Out Cross Validation...\n")
+print("\nRunning Leave-One-Scene-Out Cross Validation\n")
 
 for train_idx, val_idx in logo.split(X, y, groups):
     X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]

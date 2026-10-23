@@ -44,7 +44,7 @@ arr_2d = arr.reshape(-1, B)
 # ------------------------------------------------
 # Predict FSC
 # ------------------------------------------------
-print("Running SVM prediction on", arr_2d.shape[0], "pixels ...")
+print("Running SVM prediction on", arr_2d.shape[0], "pixels")
 
 #only predict pixels without NaN (outside AOI is NaN, SVR cant handle NaN)
 valid = ~np.isnan(arr_2d).any(axis=1)

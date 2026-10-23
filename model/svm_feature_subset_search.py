@@ -112,7 +112,7 @@ def evaluate_subset(feature_subset):
 
     print(
         f"[{datetime.now().strftime('%H:%M:%S')}] "
-        f"SVM ({len(feature_subset)}): {list(feature_subset)} → "
+        f"SVM ({len(feature_subset)}): {list(feature_subset)}, "
         f"RMSE={rmse:.4f}"
     )
 

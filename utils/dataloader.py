@@ -227,7 +227,7 @@ def fsc_with_s2_mask(
     # Optional save
     if output is not None:
         fsc.rio.to_raster(output, compress="LZW")
-        print(f"Saved FSC → {output}")
+        print(f"Saved FSC: {output}")
 
     return fsc
 
@@ -269,4 +269,4 @@ def save_dataset_as_tiff(ds: xr.Dataset, output_path: Path):
             dst.write(arr[i-1], i)
             dst.set_band_description(i, name)
 
-    print(f"Saved dataset with band names → {output_path}")
+    print(f"Saved dataset with band names: {output_path}")

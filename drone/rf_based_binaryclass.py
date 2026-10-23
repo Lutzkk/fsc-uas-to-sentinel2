@@ -25,7 +25,7 @@ class RandomForestSnowClassifier:
                     print(f"Using existing reprojected raster: {out_path}")
                     self.rgb_path = out_path
                 else:
-                    print("Reprojecting raster to EPSG:32632...")
+                    print("Reprojecting raster to EPSG:32632")
                     transform, width, height = calculate_default_transform(
                         src.crs, self.target_crs, src.width, src.height, *src.bounds)
                     profile = src.profile.copy()
@@ -62,7 +62,7 @@ class RandomForestSnowClassifier:
                 print(f"Using existing reprojected shapefile: {out_shp}")
                 self.training_path = out_shp
             else:
-                print("Reprojecting shapefile to EPSG:32632...")
+                print("Reprojecting shapefile to EPSG:32632")
                 gdf = gdf.to_crs(self.target_crs)
                 gdf.to_file(out_shp)
                 self.training_path = out_shp
@@ -72,7 +72,7 @@ class RandomForestSnowClassifier:
 
 
     def load_rgb(self):
-        print("Loading RGB and alpha bands...")
+        print("Loading RGB and alpha bands")
         with rasterio.open(self.rgb_path) as src:
             self.rgb = src.read([1, 2, 3])
             self.alpha = src.read(4)
@@ -83,7 +83,7 @@ class RandomForestSnowClassifier:
             self.crs = src.crs
 
     def load_training(self):
-        print("Loading training data and rasterizing label raster...")
+        print("Loading training data and rasterizing label raster")
         gdf = gpd.read_file(self.training_path)
 
         shapes = ((geom, value) for geom, value in zip(gdf.geometry, gdf['id']))
@@ -97,7 +97,7 @@ class RandomForestSnowClassifier:
         )
 
     def extract_samples(self):
-        print("Extracting training samples...")
+        print("Extracting training samples")
         X = self.rgb.reshape(3, -1).T
         y = self.label_raster.flatten()
         alpha = self.alpha.flatten()
@@ -109,12 +109,12 @@ class RandomForestSnowClassifier:
         self.X_full = X
 
     def train_rf(self):
-        print("Training random forest classifier...")
+        print("Training random forest classifier")
         self.clf = RandomForestClassifier(n_estimators=200, n_jobs=-1, random_state=42)
         self.clf.fit(self.X_train, self.y_train)
 
     def classify_and_binarize(self, block_size=2048):  # <-- FIXED: now inside the class
-        print("Classifying raster in chunks and binarizing result...")
+        print("Classifying raster in chunks and binarizing result")
         self.classified = np.zeros((self.height, self.width), dtype=np.uint8)
         self.binary = np.zeros((self.height, self.width), dtype=np.uint8)
 
@@ -156,7 +156,7 @@ class RandomForestSnowClassifier:
             dst.write(self.binary, 1)
 
     def run(self, classified_out, binary_out):
-        print("Starting classification pipeline...\n")
+        print("Starting classification pipeline\n")
         #self.ensure_reprojection()
         self.load_rgb()
         self.load_training()
@@ -179,12 +179,12 @@ def check_case(name, rgb_path, training_path, classified_out, binary_out):
     binary_out = Path(binary_out)
 
     # --- existence ---
-    print(f"RGB exists:      {rgb_path} -> {rgb_path.exists()}")
-    print(f"Training exists: {training_path} -> {training_path.exists()}")
+    print(f"RGB exists:      {rgb_path.exists()} ({rgb_path})")
+    print(f"Training exists: {training_path.exists()} ({training_path})")
 
     # --- output dirs ---
-    print(f"Classified dir exists: {classified_out.parent} -> {classified_out.parent.exists()}")
-    print(f"Binary dir exists:     {binary_out.parent} -> {binary_out.parent.exists()}")
+    print(f"Classified dir exists: {classified_out.parent.exists()} ({classified_out.parent})")
+    print(f"Binary dir exists:     {binary_out.parent.exists()} ({binary_out.parent})")
 
     # --- raster sanity ---
     if rgb_path.exists():

@@ -1,5 +1,6 @@
 from pathlib import Path 
 import sys
+sys.path.append(str(Path(__file__).resolve().parents[1])) #crawl up one level to project root
 import pandas as pd
 from utils.dataloader import compute_global_percentiles, apply_percentile_normalization, fsc_with_s2_mask, load_sentinel_scene, crop_s2_to_binary_mask, save_dataset_as_tiff
 from utils.paths import load_paths
@@ -10,8 +11,6 @@ import time
 from rasterio.enums import Resampling
 
 def main():
-    sys.path.append(str(Path(__file__).resolve().parents[1]))  # crawl up to project root
-
     paths = load_paths()
 
     # Define paths to drone scenes
@@ -40,7 +39,7 @@ def main():
     #PREPROCESSING: FSC GT CREATION, DRONE SCENE ALIGNMENT
 
     #load and align rasters to the 2024-09-20 scene
-    print("Loading binary snow masks (drone scenes)...")
+    print("Loading binary snow masks (drone scenes)")
     snow_0920 = rxr.open_rasterio(drone_path_20240920, masked=True).squeeze()
     snow_1025 = rxr.open_rasterio(drone_path_20241025, masked=True).squeeze()
     snow_0225 = rxr.open_rasterio(drone_path_20250225, masked=True).squeeze()
@@ -63,7 +62,7 @@ def main():
 
     #------------------------------
 
-    print("Starting Sentinel-2 Data Preprocessing...")
+    print("Starting Sentinel-2 Data Preprocessing")
     #SENTINEL-2 SCENE LOADING, FOREST MASKING  AND NORMALIZATION
     s2_0920 = load_sentinel_scene(s2_0920_p) #loads and resamples to 10m (deafualt bilinear)
     s2_1024 = load_sentinel_scene(s2_1024_p) #loads and resamples to 10m (deafualt bilinear)
@@ -78,29 +77,29 @@ def main():
     save_dataset_as_tiff(s2_0920, paths["data"]["processed_s2"] / "s2_20240920_test.tif")
 
 
-    print("Computing global 1-99 percentile normalization parameters from training scenes...")
+    print("Computing global 1-99 percentile normalization parameters from training scenes")
     pct = compute_global_percentiles([s2_0920, s2_1024, s2_0221])
 
-    print("Applying percentile normalization to training scenes...")
+    print("Applying percentile normalization to training scenes")
     s2_0920 = apply_percentile_normalization(s2_0920, pct)
     s2_1024 = apply_percentile_normalization(s2_1024, pct)
     s2_0221 = apply_percentile_normalization(s2_0221, pct)
     print(pct)
 
     # Spectral Index Calculation
-    print("Calculating spectral indices...")
-    print("Calculating NDSI...")
+    print("Calculating spectral indices")
+    print("Calculating NDSI")
     
     s2_0920["NDSI"]=compute_spectral_index(s2_0920, b1="B3", b2="B11", index_type="NDSI")
     s2_1024["NDSI"]=compute_spectral_index(s2_1024, b1="B3", b2="B11", index_type="NDSI")
     s2_0221["NDSI"]=compute_spectral_index(s2_0221, b1="B3", b2="B11", index_type="NDSI")
 
-    print("Calculating NDVI...")
+    print("Calculating NDVI")
     s2_0920["NDVI"]=compute_spectral_index(s2_0920, b1="B8", b2="B4", index_type="NDVI")
     s2_1024["NDVI"]=compute_spectral_index(s2_1024, b1="B8", b2="B4", index_type="NDVI")
     s2_0221["NDVI"]=compute_spectral_index(s2_0221, b1="B8", b2="B4", index_type="NDVI")
 
-    print("Calculating NDWI...")
+    print("Calculating NDWI")
     s2_0920["NDWI"]=compute_spectral_index(s2_0920, b1="B3", b2="B8", index_type="NDWI")
     s2_1024["NDWI"]=compute_spectral_index(s2_1024, b1="B3", b2="B8", index_type="NDWI")
     s2_0221["NDWI"]=compute_spectral_index(s2_0221, b1="B3", b2="B8", index_type="NDWI")
@@ -118,13 +117,13 @@ def main():
 
 
     #-----------------------------
-    print("Generating Validation Scene out of two S2 scenes of the same date...")
+    print("Generating Validation Scene out of two S2 scenes of the same date")
     s2_0606_0_p=paths["data"]["s2_dir"]/"S2_2025_06_06_0.tif"
     s2_0606_1_p=paths["data"]["s2_dir"]/"S2_2025_06_06_1.tif"
     s2_0606_0_mask_p=paths["data"]["s2_dir"]/"masking/S2_2025-06-06_0_mask.shp"
     s2_0606_1_mask_p=paths["data"]["s2_dir"]/"masking/S2_2025-06-06_1_mask.shp"
 
-    print("Loading both S2 Scenes, clipping and normalizing them...")
+    print("Loading both S2 Scenes, clipping and normalizing them")
     s2_0606_0=load_sentinel_scene(s2_0606_0_p)
     s2_0606_1=load_sentinel_scene(s2_0606_1_p)
     s2_0606_0=crop_s2_to_binary_mask(s2_0606_0, fsc_grid)
@@ -132,17 +131,17 @@ def main():
     s2_0606_0 = apply_percentile_normalization(s2_0606_0, pct)
     s2_0606_1 = apply_percentile_normalization(s2_0606_1, pct)
 
-    print("Applying vector masks to both scenes...")
+    print("Applying vector masks to both scenes")
 
     s2_0606_0_masked=vectormask(s2_0606_0, s2_0606_0_mask_p)
     s2_0606_1_masked=vectormask(s2_0606_1, s2_0606_1_mask_p)
 
-    print("Merging both masked scenes into one validation scene...")
+    print("Merging both masked scenes into one validation scene")
     s2_merged = merge_s2_scenes(s2_0606_0_masked, s2_0606_1_masked)
     print(s2_merged["B2"].min().item(), s2_merged["B2"].max().item())
     print(s2_merged["B3"].min().item(), s2_merged["B3"].max().item())
     print(s2_merged["B4"].min().item(), s2_merged["B4"].max().item())
-    print("Calculating spectral indices for validation scene...")
+    print("Calculating spectral indices for validation scene")
     s2_merged["NDSI"]=compute_spectral_index(s2_merged, b1="B3", b2="B11", index_type="NDSI")
     s2_merged["NDVI"]=compute_spectral_index(s2_merged, b1="B8", b2="B4", index_type="NDVI")
     s2_merged["NDWI"]=compute_spectral_index(s2_merged, b1="B3", b2="B8", index_type="NDWI")
@@ -150,7 +149,7 @@ def main():
 
     print("Sentinel-2 Data Preprocessing Complete.")
 
-    print("Attaching FSC GT to processed Sentinel-2 scenes...")
+    print("Attaching FSC GT to processed Sentinel-2 scenes")
     s2_0920["FSC_GT"]=fsc_0920
     s2_1024["FSC_GT"]=fsc_1024
     s2_0221["FSC_GT"]=fsc_0225
@@ -158,7 +157,7 @@ def main():
 
 
 
-    print("Saving processed Sentinel-2 scenes to disk...")
+    print("Saving processed Sentinel-2 scenes to disk")
 
     save_dataset_as_tiff(s2_0920, paths["data"]["processed_s2"] / "s2_20240920_processed.tif")
     save_dataset_as_tiff(s2_1024, paths["data"]["processed_s2"] / "s2_20241024_processed.tif")
@@ -186,12 +185,12 @@ def main():
     # Save training data
     train_path = out_dir / "train_fsc.csv"
     df_train.to_csv(train_path, index=False)
-    print(f"Saved training dataframe → {train_path}")
+    print(f"Saved training dataframe: {train_path}")
 
     # Save validation data
     val_path = out_dir / "val_fsc.csv"
     df_val.to_csv(val_path, index=False)
-    print(f"Saved validation dataframe → {val_path}")
+    print(f"Saved validation dataframe: {val_path}")
 
     
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ class NDSIWithThermal:
                     print(f"Using existing reprojected raster: {out_path}")
                     self.input_path = out_path
                 else:
-                    print("Reprojecting raster to EPSG:32632...")
+                    print("Reprojecting raster to EPSG:32632")
                     transform, width, height = calculate_default_transform(
                         src.crs, self.target_crs, src.width, src.height, *src.bounds)
                     profile = src.profile.copy()
@@ -50,14 +50,14 @@ class NDSIWithThermal:
                 print("Raster is already in EPSG:32632.")
 
     def run(self):
-        print("Opening multispectral image...")
+        print("Opening multispectral image")
         with rasterio.open(self.input_path) as src:
             green = src.read(2).astype(np.float32)
             nir = src.read(5).astype(np.float32)
             thermal=src.read(6).astype(np.float32)
             profile = src.profile
 
-        print("Masking invalid pixels...")
+        print("Masking invalid pixels")
         invalid_mask = (green == 65535) & (nir == 65535)
 
         print("normalizing thermal data")
@@ -67,20 +67,20 @@ class NDSIWithThermal:
         thermal = np.clip(thermal, min_temp, max_temp)
         thermal_normalized= (thermal - min_temp) / (max_temp - min_temp)
 
-        print("Calculating pseudo NDSI...")
+        print("Calculating pseudo NDSI")
         ndsi = (green - nir) / (green + nir + 1e-6)
         alpha=0.3 #value between 0 and 1 -> 0 == no thermal correction, 1 == full thermal correction
         ndsi_enhanced=ndsi + alpha *(1-thermal_normalized)
 
-        print("Applying Otsu thresholding...")
+        print("Applying Otsu thresholding")
         valid_pixels = ndsi_enhanced[~invalid_mask]
         threshold = threshold_otsu(valid_pixels)
 
-        print("Generating binary snow mask...")
+        print("Generating binary snow mask")
         binary = np.where(ndsi_enhanced >= threshold, 1, 0).astype(np.uint8)
         binary[invalid_mask] = 255
 
-        print("Saving outputs...")
+        print("Saving outputs")
         ndsi_masked = np.where(invalid_mask, np.nan, ndsi_enhanced)
 
         profile.update(dtype='float32', count=1)

@@ -29,9 +29,8 @@ Estimating fractional snow cover (FSC) at Sentinel-2 resolution (10 m) on the Zu
 ```
 config/paths.yaml        data root + paths to all inputs/outputs
 utils/                   loading, resampling, masking, FSC aggregation helpers
-preprocessing/           Sentinel-2 download, S2 grid mask of the AOI
+preprocessing/           Sentinel-2 download, S2 grid mask of the AOI, FSC ground truth + features
 drone/                   binary snow classification of the UAS scenes + accuracy check
-feature_engineering.py   FSC ground truth, S2 features, train/test dataframes
 model/                   feature subset search (RF, SVR), final model (not included, can be sent on request)
 docs/                    poster (PDF)
 ```
@@ -52,7 +51,7 @@ The workflow is as follows:
    - `drone/indexbased_thermalweight_binaryclass.py` (Jun)
    - `drone/binary_classes_validation.py`: accuracy against independent validation polygons
 3. **Sentinel-2 grid mask** of the AOI: `preprocessing/fsc_ground_truth_creator.py`
-4. **Ground truth + features**: `feature_engineering.py`
+4. **Ground truth + features**: `preprocessing/feature_engineering.py`
    aggregates the binary maps to FSC on the S2 grid (only pixels with ≥ 90 % drone coverage), computes NDSI/NDVI/NDWI, adds the DSM and writes `train_fsc.csv` / `val_fsc.csv`
 5. **Feature subset search**: all 16,278 combinations of 3–14 features
    - `model/rf_feature_subset_search.py`
