@@ -2,6 +2,8 @@
 
 Estimating fractional snow cover (FSC) at Sentinel-2 resolution (10 m) on the Zugspitzplateau, using very-high-resolution drone imagery as ground truth. This repository contains the scripts used to generate the results presented in the poster "From UAS to Satellite: Fractional Snow Cover Mapping of the Zugspitzplateau" ([PDF](docs/poster_fsc_mapping.pdf)). 
 
+The project was part of my work at the [Earth Observation Research Cluster](https://remote-sensing.org/), Department of Remote Sensing, Institute of Geography and Geology, University of Würzburg, Germany.
+
 **This is not a modular data pipeline. The scripts are of exploratory nature and were written for a single project. No Data is included (copyright).** 
 
 Maybe someone finds it useful as reference or for building a more general pipeline from this. 
@@ -45,10 +47,9 @@ Python scripts use  `config/paths.yaml` to access the data. `utils/` contains he
 
 The workflow is as follows:
 
-
 1. **Sentinel-2 download** (Earth Engine exports to Google Drive)
    - `preprocessing/s2_obtain_gee.py` (2024/2025 scenes)
-   - *manual:* rename exports to `S2_YYYY_MM_DD.tif` / `S2_2025_06_06_0.tif`, `_1.tif`
+   - move exports from Drive to data/s2/
 2. **Binary snow maps** from the UAS scenes
    - `drone/rf_based_binaryclass.py` → `drone/speckling_noise_remove.py` (Sep, Oct)
    - `drone/ndsi.py` (Feb)
@@ -89,6 +90,7 @@ Manual inputs that no script creates: RF training polygons, validation polygons 
 ### Research Question 1 (Are three scenes enough?)
 - Both models achieve stable performances across feature subsets (R² ~0.6-0.7; best: SVR: 0.77, RF: 0.72) 
 - Both models reproduce spatial snow patterns in mixed pixels
+- Three scenes can be enough, depending on the amount of mixed pixels
 
 ### Research Question 2 (Feature importance)
 - Random Forest more robust to feature selection than the SVR
@@ -117,4 +119,10 @@ Parts of the code were written with the help of AI tools (code suggestions, debu
 
 ## Author
 
-Lutz Kleemann, Department of Remote Sensing, University of Würzburg
+Lutz Kleemann (EAGLE M.Sc.)
+Earth Observation Research Cluster, Department of Remote Sensing, Institute of Geography and Geology, University of Würzburg
+
+## Supervisors
+
+- [Elio Rauth](https://orcid.org/0009-0005-2921-252X), Earth Observation Research Cluster, Department of Remote Sensing, Institute of Geography and Geology, University of Würzburg
+- [Basil Tufail](https://orcid.org/0009-0004-2884-8799), Earth Observation Research Cluster, Department of Remote Sensing, Institute of Geography and Geology, University of Würzburg
