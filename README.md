@@ -122,5 +122,5 @@ Earth Observation Research Cluster, Department of Remote Sensing, Institute of G
 
 ## Supervisors
 
-- [Elio Rauth](https://orcid.org/0009-0005-2921-252X), Earth Observation Research Cluster, Department of Remote Sensing, Institute of Geography and Geology, University of Würzburg
-- [Basil Tufail](https://orcid.org/0009-0004-2884-8799), Earth Observation Research Cluster, Department of Remote Sensing, Institute of Geography and Geology, University of Würzburg
+[Elio Rauth](https://orcid.org/0009-0005-2921-252X), Earth Observation Research Cluster, Department of Remote Sensing, Institute of Geography and Geology, University of Würzburg
+[Basil Tufail](https://orcid.org/0009-0004-2884-8799), Earth Observation Research Cluster, Department of Remote Sensing, Institute of Geography and Geology, University of Würzburg
